@@ -4,14 +4,13 @@ from random import randint
 from access_control import access_control
 from constants import ADMIN_USERNAME, UNKNOWN_COMMAND
 
-
-class GuessNumber:
+class GuessGame:
 
     def __init__(self):
-        self.username = self.get_username()
         self.start_time = dt.now()
         self.total_games = 0
-        self.number = 0
+        self.username = self.get_username()
+        self.current_game_number = 0
 
     def get_username(self) -> str:
         self.username = input('Представьтесь, пожалуйста, как Вас зовут?\n').strip()
@@ -25,6 +24,7 @@ class GuessNumber:
         return self.username
 
 
+
     @access_control
     def get_statistics(self, *args, **kwargs) -> None:
         game_time = dt.now() - self.start_time
@@ -32,8 +32,8 @@ class GuessNumber:
 
 
     @access_control
-    def get_right_answer(self, *args, **kwargs) -> None:
-        print(f'Правильный ответ: {self.number}')
+    def get_right_answer(self, number: int, *args, **kwargs) -> None:
+        print(f'Правильный ответ: {number}')
 
 
     def check_number(self, guess: int, number: int) -> bool:
@@ -52,7 +52,7 @@ class GuessNumber:
 
     def game(self) -> None:
         # Получаем случайное число в диапазоне от 1 до 100.
-        self.number = randint(1, 100)
+        number = randint(1, 100)
         print(
             '\nУгадайте число от 1 до 100.\n'
             'Для выхода из текущей игры введите команду "stop"'
@@ -65,9 +65,9 @@ class GuessNumber:
             if user_input == 'stop':
                 break
             elif user_input == 'stat':
-                self.get_statistics(username=self.username)
+                self.get_statistics(total_games, username=self.username)
             elif user_input == 'answer':
-                    self.get_right_answer(username=self.username)
+                    self.get_right_answer(number, username=self.username)
             else:
                 try: 
                     guess = int(user_input)                
@@ -75,7 +75,7 @@ class GuessNumber:
                     print(UNKNOWN_COMMAND)
                     continue
                 else:
-                    if self.check_number(guess, self.number):
+                    if self.check_number(guess, number):
                         break          
 
 
@@ -93,5 +93,5 @@ if __name__ == '__main__':
         'Вас приветствует игра "Угадай число"!\n'
         'Для выхода нажмите Ctrl+C'
     )
-    game = GuessNumber()
+    game = GuessGame()
     game.guess_number()
